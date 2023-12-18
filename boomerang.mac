@@ -1,0 +1,217 @@
+#include spell_routines.inc
+
+#event Ended "#*#The results of the contest are as follows#*#"
+
+
+Sub Main
+/doevents
+/echo Starting Boomerang Routines
+/echo Dont forget to start mac on other bots
+
+     /call StartMatch
+     /delay 5
+   
+/return 
+
+
+Sub Event_Ended(Line,RewardAmount,RewardType)
+   /echo Task Ended..
+   /delay 30s
+   /taskremove ${Me.Name}
+   /delay 5s
+   /endmac
+    
+:ZoneLoop 
+   /squelch /moveto loc -301.11 5.16
+   /delay 5s
+   /keypress use
+   /delay 3s
+   /keypress u
+   /delay 30s
+   /if (${Zone.Name.Equal[Brell's Arena]}) {
+   /goto :ZoneLoop
+   }
+   /if (${Zone.Name.Equal[Brell's Rest]}) {
+   
+   /end
+   }
+/return 
+
+
+
+
+Sub StartMatch
+/echo Starting Match!!!
+
+/call AlertTimer
+/if (!${Defined[lasteventnum]}) /declare lasteventnum int outer 0
+/if (!${Defined[strafedir]}) /declare strafedir string local
+/if (!${Defined[X2]}) /declare X2 int local
+/if (!${Defined[Y2]}) /declare Y2 int local
+/if (!${Defined[spawnID]}) /declare spawnID int local 0
+/if (!${Defined[spawn2id]}) /declare spawn2id int local 0
+/if (!${Defined[spawn2]}) /declare spawn2 string local
+/if (!${Defined[spawn2dist]}) /declare spawn2dist int local 0
+/if (!${Defined[spawn2locY]}) /declare spawn2locY int local 0
+/if (!${Defined[spawn2locX]}) /declare spawn2locX int local 0
+
+
+/varset lasteventnum 0
+/target clear
+
+|- updated teamcolor logic from Ralindal
+  /if (!${Defined[teamColor]}) /declare teamColor string outer NULL
+  /if (${FindItemCount[=Red Boomerang]}>0 && ${FindItemCount[=Yellow Boomerang]}>0) {
+    /varset teamColor BLUE
+  } else /if (${FindItemCount[=Blue Boomerang]}>0 && ${FindItemCount[=Yellow Boomerang]}>0) {
+    /varset teamColor RED
+  } else {
+    /varset teamColor YELLOW
+  }
+
+
+:boomerangloop
+
+/doevents
+/if (${lasteventnum}==9 || ${Me.State.Equal[HOVER]}) /return
+
+/if (${Me.State.Equal[FEIGN]}) /stand
+/delay 3s ${Me.State.Equal[STAND]}
+
+/varset spawnID 0
+/call GMCheck
+/if (${teamColor.Equal[BLUE]}) /varset spawnID ${Me.NearestSpawn[1, npc noalert 1 range 86 89].ID}
+/if (${teamColor.Equal[YELLOW]}) {
+|- updated so yellow team will pick up blue and red instead of just red, due to split level range
+/varset spawnID ${Me.NearestSpawn[1, npc noalert 1 range 89 89].ID}
+/if (!${spawnID}) /varset spawnID ${Me.NearestSpawn[1, npc noalert 1 range 84 84].ID}
+}
+/if (${teamColor.Equal[RED]}) /varset spawnID ${Me.NearestSpawn[1, npc noalert 1 range 84 86].ID}
+
+/if (${spawnID} && ${Spawn[id ${spawnID}].State.NotEqual[FEIGN]}) {
+  /target id ${spawnID}
+  /delay 1s ${Target.ID}==${spawnID}
+}
+
+/if (!${Target.ID}) {
+/call AlertTimer
+} else {
+
+      :moveloop
+
+      /if (${Me.State.Equal[FEIGN]}) /stand
+      /delay 3s ${Me.State.Equal[STAND]}
+
+      /if (${Target.Distance}>50) {
+          |- Get the details of the nearest powder keg
+          /varset spawn2id ${Me.NearestSpawn[1, race "Powder Keg"].ID}
+          /if (${spawn2id}) /multiline ; /varset spawn2 ${Spawn[${spawn2id}]} ; /varset spawn2dist ${Spawn[${spawn2id}].Distance} ; /varset spawn2locY ${Spawn[${spawn2id}].Y} ; /varset spawn2locX ${Spawn[${spawn2id}].X}
+          |- If the barrel is too close, lets back off and strafe around it before moving towards our target
+          /if (${spawn2id} && ${spawn2dist}<90) {
+         
+         /face fast nolook loc ${spawn2locY},${spawn2locX}
+               /keypress back hold
+               /delay 1s
+               /keypress back
+               /if (${Math.Rand[2]}) {
+                 /varset strafedir STRAFE_LEFT
+               } else {
+                 /varset strafedir STRAFE_RIGHT
+               }
+               /keypress ${strafedir} hold
+               /delay 8
+               /keypress ${strafedir}
+              }
+
+               |- Set current position first before heading towards our target (in case we get stuck)
+              /varset X2 ${Int[${Me.X}]}
+              /varset Y2 ${Int[${Me.Y}]}
+
+         /if (${Me.State.Equal[FEIGN]}) /stand
+         /delay 3s ${Me.State.Equal[STAND]}
+         /face fast nolook
+                /keypress forward hold
+              /delay 5 ${Target.Distance}<=50
+              /keypress forward
+         /if (${Me.State.Equal[FEIGN]}) /stand
+         /delay 3s ${Me.State.Equal[STAND]}
+         /face fast nolook
+
+              |- Check to see if we got stuck trying that
+              /if ((${Int[${Me.X}]}==${X2}) && (${Int[${Me.Y}]}==${Y2})) {
+               |- We're stuck, back off a second, move left or right (randomly) for .5 seconds
+               /keypress back hold
+               /delay 5
+               /keypress back
+               /if (${Math.Rand[2]}) {
+                 /varset strafedir STRAFE_LEFT
+               } else {
+                 /varset strafedir STRAFE_RIGHT
+               }
+               /keypress ${strafedir} hold
+               /delay 5
+               /keypress ${strafedir}
+              }
+      /goto :moveloop
+      }
+   
+      /if (${Target.Level}==89 && ${FindItemCount[=Red Boomerang]}>0) {
+      |- updated to revert back to moveloop if boomerang not ready, per dascott's idea
+      /if (${FindItem[Red Boomerang].Timer}) /goto :moveloop
+      /if (${Me.State.Equal[FEIGN]}) /stand
+      /delay 3s ${Me.State.Equal[STAND]}
+      /face fast nolook
+     
+      /cast item "Red Boomerang"
+      /cast item "Red Boomerang"
+      }
+      /if (${Target.Level}==86 && ${FindItemCount[=Yellow Boomerang]}>0) {
+      /if (${FindItem[Yellow Boomerang].Timer}) /goto :moveloop
+      /if (${Me.State.Equal[FEIGN]}) /stand
+      /delay 3s ${Me.State.Equal[STAND]}
+      /face fast nolook
+      /call GMCheck
+      /cast item "Yellow Boomerang"
+      /cast item "Yellow Boomerang"
+      }
+      /if (${Target.Level}==84 && ${FindItemCount[=Blue Boomerang]}>0) {
+      /if (${FindItem[Blue Boomerang].Timer}) /goto :moveloop
+      /if (${Me.State.Equal[FEIGN]}) /stand
+      /delay 3s ${Me.State.Equal[STAND]}
+      /face fast nolook
+     
+      /cast item "Blue Boomerang"
+      /cast item "Blue Boomerang"
+      }
+
+/squelch /alert add 1 id ${Target.ID}
+/squelch /target clear
+
+|-/if (${FindItemCount[=Brell's Personal Blessing]}>0 && !${FindItem[Brell's Personal Blessing].Timer}) /call Cast "Brell's Personal Blessing" item
+
+}
+
+/goto :boomerangloop
+
+/return
+
+Sub GMCheck
+
+   /if (${Spawn[gm].ID}) {
+      /beep
+      /beep
+      /beep
+      /echo GM entered the zone!
+      /echo For safty reasons ending the macro...
+      /endmacro
+   }
+
+/return 
+
+Sub AlertTimer
+
+/squelch /alert clear 1
+/squelch /alert add 1 BRADiscusController
+
+
+/return
