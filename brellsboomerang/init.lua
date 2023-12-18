@@ -276,7 +276,7 @@ local function DoBoomerang()
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
 		currentState = currentState + 1
-		mq.delay(5000)
+		mq.delay(2000)
 	end
 
 	if loopState[currentState] == "doEvent" then
@@ -294,7 +294,7 @@ local function DoBoomerang()
 	
 	if loopState[currentState] == "waitingForRepop" then
 		Write.Info('\a-gWe are currently idling. Repop in about 25 minutes. Will run in 30 mins.')
-		mq.delay(1800000)
+		mq.delay(2000000)
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState-5])
 		currentState = currentState - 5
