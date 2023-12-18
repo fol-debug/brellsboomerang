@@ -220,7 +220,7 @@ local function DoBoomerang()
 		mq.cmdf('/squelch /dgga /nav locyx 169 417 -23')
 	end
 		if myID ~= groupLeaderID then
-			mq.delay(26000)
+			mq.delay(32000)
 		end
 		if myID == groupLeaderID then
 			mq.cmdf('/squelch /tar magnificent')
@@ -251,11 +251,11 @@ local function DoBoomerang()
 			end
 			Write.Info('\a-gChecking and creating Fellowship Campfire.')
 			campFire()
-			mq.delay(10000)
+			mq.delay(3000)
 		end
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
 		currentState = currentState + 1
-		mq.delay(5000)
+		mq.delay(2000)
 	end
 
 	if loopState[currentState] == "travelMission" then
@@ -286,8 +286,7 @@ local function DoBoomerang()
 	if loopState[currentState] == "startEvent" then
 		Write.Info('\a-gGroupleader starting event.')
 		if myID == groupLeaderID then
-			mq.cmdf('/squelch /target Gilbot')
-			mq.cmdf('/squelch /nav target')
+			mq.cmdf('/squelch /nav spawn npc Gilbot')
 			mq.delay(2000)
 			mq.cmdf('/squelch /say start')
 		end
@@ -337,12 +336,12 @@ local function DoBoomerang()
 	end
 	
 	if loopState[currentState] == "waitingForRepop" then
-		Write.Info('\a-gWe are currently idling. Repop in about 25 minutes. Will run in 30 mins.')
+		Write.Info('\a-gWe are currently idling. Waiting ~45 mins.')
 		mq.delay(2700000)
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState-5])
 		currentState = currentState - 5
-		mq.delay(1000)	
+		mq.delay(1000)
 	end
 		
 end
