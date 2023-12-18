@@ -21,21 +21,21 @@ Sub Event_Ended(Line,RewardAmount,RewardType)
    /delay 5s
    /endmac
     
-:ZoneLoop 
-   /squelch /moveto loc -301.11 5.16
-   /delay 5s
-   /keypress use
-   /delay 3s
-   /keypress u
-   /delay 30s
-   /if (${Zone.Name.Equal[Brell's Arena]}) {
-   /goto :ZoneLoop
-   }
-   /if (${Zone.Name.Equal[Brell's Rest]}) {
-   
-   /end
-   }
-/return 
+|-:ZoneLoop 
+|-   /squelch /moveto loc -301.11 5.16
+|-   /delay 5s
+|-   /keypress use
+|-   /delay 3s
+|-   /keypress u
+|-   /delay 30s
+|-   /if (${Zone.Name.Equal[Brell's Arena]}) {
+|-   /goto :ZoneLoop
+|-   }
+|-   /if (${Zone.Name.Equal[Brell's Rest]}) {
+|-   /endmac
+|-   /end
+|-   }
+|-/return 
 
 
 

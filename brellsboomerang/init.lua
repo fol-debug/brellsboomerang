@@ -14,6 +14,7 @@ Write.prefix = 'brellsboomerang'
 Write.loglevel = 'info'
 
 local DoLoop = true
+local DoLoopZonedOut = true
 local luaName = 'brellsboomerang'
 local teamSelected = ''
 local loopState = {
@@ -22,7 +23,8 @@ local loopState = {
 	[2] = "travelMission",
 	[3] = "startEvent",
 	[4] = "doEvent",
-	[5] = "waitingForRepop"
+	[5] = "zonedOut",
+	[6] = "waitingForRepop"
 }
 
 local currentState = 0
@@ -48,7 +50,7 @@ local function campFire()
 
         -- Click destroy campsite.
         mq.TLO.Window('FellowshipWnd/FP_Subwindows/FP_DestroyCampsite').LeftMouseUp()
-        mq.delay(5000, function ()
+        mq.delay(3000, function ()
             return mq.TLO.Window('ConfirmationDialogBox').Open()
         end)
         if (mq.TLO.Window('ConfirmationDialogBox').Open()) then
@@ -56,7 +58,7 @@ local function campFire()
         end
 
         -- Wait a bit to make sure campfire gone
-        mq.delay(5000, function ()
+        mq.delay(3000, function ()
             return not mq.TLO.Me.Fellowship.Campfire()
         end)
     end
@@ -82,7 +84,7 @@ local function campFire()
         
         -- Click create camp
         mq.TLO.Window('FellowshipWnd/FP_Subwindows/FP_CreateCampsite').LeftMouseUp()
-        mq.delay(5000, function ()
+        mq.delay(3000, function ()
             return mq.TLO.Me.Fellowship.Campfire()
         end)
         mq.delay(1000)
@@ -94,7 +96,7 @@ local function campFire()
             Write.Warn('\a-gEnd of campfire function but no campfire.  Continuing but you\'ll have to wait to get kicked.')
         end
 
-        mq.delay(1000)
+        mq.delay(500)
     end
 end
 
@@ -112,12 +114,28 @@ local function checkGroup()
 		if mq.TLO.SpawnCount('group radius 100')() < groupSize then
 			Write.Info('\a-gAll members of group are not present. Lets get them here.')
 			if myID == groupLeaderID then
-				mq.cmdf('/squelch /dge /nav spawn id %s', groupLeaderID)
+				mq.cmdf('/squelch /dgga /nav spawn id %s', groupLeaderID)
 				mq.delay(10000)
 			end
 		else
 			Write.Info('\a-gEveryone is present. Lets continue.')
 		end	
+	end
+end
+
+local function checkGroupStatus()
+    --
+	local myID = mq.TLO.Me.ID
+	local groupLeaderID = mq.TLO.Group.Leader.ID
+	groupSize = mq.TLO.Group()+1
+	if mq.TLO.SpawnCount('group radius 100')() < groupSize then
+		Write.Info('\a-gAll members of group are not present. Lets get them here.')
+		if myID == groupLeaderID then
+			mq.cmdf('/squelch /dgga /nav spawn id %s', groupLeaderID)
+			mq.delay(10000)
+		end
+	else
+		Write.Info('\a-gEveryone is present. Lets head back to Campfire.')
 	end
 end
 
@@ -282,22 +300,45 @@ local function DoBoomerang()
 	if loopState[currentState] == "doEvent" then
 		Write.Info('\a-gRunning brellsboomerang.mac -- do not interfere. Will campfire once done and restart within 40 minutes.')
 		mq.cmdf('/squelch /mac boomerang')
-		mq.delay(900000)
-		mq.cmdf('/squelch /endmac')
-		mq.delay(1000)
-		mq.cmdf('/squelch /makemevisible')
-		mq.cmdf('/lua stop brellsboomerang')
-		mq.delay(1000)
-		mq.cmdf('/squelch /casting "Fellowship Registration Insignia"')
+		Write.Info('\a-gInstance ending. Waiting for port out.')
+		mq.delay(1080000)
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
 		currentState = currentState + 1
 		mq.delay(1000)
 	end
+
+	if loopState[currentState] == "zonedOut" then
+		-- Check to see if we have zoned out.
+		while DoLoopZonedOut do
+			if mq.TLO.Zone.ID() == 480 then
+				DoLoopZonedOut = false
+			end
+		end
+		if mq.TLO.Zone.ID() == 480 then
+			local correctZone = true
+			Write.Info('\a-gCorrect zone. Next step; make sure we end macro, remove invis, and cast Insignia.')
+			checkGroupStatus()
+			mq.delay(5000)
+			mq.cmdf('/squelch /endmac')
+			mq.delay(1000)
+			mq.cmdf('/squelch /makemevisible')
+			mq.delay(1000)
+			mq.cmdf('/squelch /casting "Fellowship Registration Insignia"')
+		else
+			Write.Info('\a-gSomething has gone wrong. Either dead/LD or plain missing. Ending LUA.')
+			mq.delay(5000)
+			mq.cmdf('/squelch /dgga /lua stop %s', luaName)
+		end
+			-- Updating state
+			Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
+			currentState = currentState + 1
+			mq.delay(1000)
+	end
 	
 	if loopState[currentState] == "waitingForRepop" then
 		Write.Info('\a-gWe are currently idling. Repop in about 25 minutes. Will run in 30 mins.')
-		mq.delay(2000000)
+		mq.delay(2700000)
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState-5])
 		currentState = currentState - 5
