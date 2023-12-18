@@ -288,6 +288,7 @@ local function DoBoomerang()
 		if myID == groupLeaderID then
 			mq.cmdf('/squelch /nav spawn npc Gilbot')
 			mq.delay(2000)
+			mq.cmdf('/squelch /tar Gilbot')			
 			mq.cmdf('/squelch /say start')
 		end
 		-- Updating state
