@@ -286,6 +286,7 @@ local function DoBoomerang()
 		mq.cmdf('/squelch /endmac')
 		mq.delay(1000)
 		mq.cmdf('/squelch /makemevisible')
+		mq.cmdf('/lua stop brellsboomerang')
 		mq.delay(1000)
 		mq.cmdf('/squelch /casting "Fellowship Registration Insignia"')
 		-- Updating state
