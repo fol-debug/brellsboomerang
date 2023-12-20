@@ -279,6 +279,8 @@ local function DoBoomerang()
 	-- checking cooldown of task, waiting if on cooldown
 	mq.doevents()
 	isInstanceOnCooldown()
+	local brawl = mq.TLO.Task("Brell's Arena - Boomerang Brawl!")
+	print(brawl)
 		if myID ~= groupLeaderID then
 			mq.delay('10s')
 		end
@@ -440,11 +442,9 @@ local function DoBoomerang()
 	end
 	
 	if loopState[currentState] == "waitingForRepop" then
-		isInstanceOnCooldown()
-		Write.Info('\a-gWe are currently idling.')
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState-5])
-		currentState = currentState - 5
+		currentState = 0
 		mq.delay(1000)
 	end
 		
