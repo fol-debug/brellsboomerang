@@ -1,5 +1,5 @@
 -- EQFoli 2023.12.05
--- Script to purchase shit.
+-- Brells Boomerang
 -- COMMENT
 -- COMMENT
 -- COMMENT
@@ -33,6 +33,22 @@ local groupLeader = mq.TLO.Group.Leader
 local groupLeaderID = mq.TLO.Group.Leader.ID
 local questGiver = 'Gilbot the Magnificent'
 local myID = mq.TLO.Me.ID
+
+local function callback(line, arg1, arg2, arg3)
+	COOLDOWN = arg3
+end
+
+local function checkCooldown()
+	mq.cmd('/tasktimer')
+	mq.delay('5s')
+	mq.doevents()
+end
+
+mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
+
+local function isempty(s)
+	return s == nil or s == ''
+  end
 
 -- Purloined from Easy.lua and PriceOfKnowledge.lua
 local function campFire()
@@ -166,6 +182,31 @@ local function checkInvis()
 	end
 end
 
+local function checkIfMacroRunning()
+	while mq.TLO.Macro() == "boomerang.mac" do
+		Write.Info('\a-gMacro is still running. Checking every 2 minutes.')
+		mq.delay('2m')
+	end
+end
+
+local function isInstanceOnCooldown()
+	checkCooldown()
+	if(COOLDOWN) then
+		CD = tonumber(COOLDOWN)
+	elseif(isempty(COOLDOWN)) then
+		CD = 0
+	end
+	while tonumber(CD) > 0 do
+		print(CD)
+		local coolinminutes = tonumber(CD) + 5
+		Write.Info('\a-gInstance is currently cooling down. %s minutes remaining. Going in %s minutes. Updating every 3 minutes.', CD, coolinminutes)
+		mq.delay('3m')
+		CD = CD - 1
+	end
+	mq.delay('2m')
+	print('Continuing. Strap in.')
+end
+
 local function checkInvisAndAct()
 	local playerName = mq.TLO.Me.Name()
 	checkInvis()
@@ -182,12 +223,19 @@ local function checkInvisAndAct()
 	end
 end
 
+local function isNavActive()
+	while mq.TLO.Navigation.Active() do
+		mq.delay(100)
+	end
+end
+
 local function DoBoomerang()
 	local areWeReady = true
 	-- load necessary plugins
 	mq.cmd('/squelch /dgga /plugin mq2dannet')
 	mq.cmd('/squelch /dgga /plugin mq2nav')
 	mq.cmd('/squelch /autoinventory')
+	mq.cmd('/squelch /dgga /plugin mq2status')
 	mq.delay(1000)
 	Write.Info('\a-gWelcome to Boomerang Hell! Please be advised that we expect you to have Cloudy Potions available.')
 
@@ -216,24 +264,26 @@ local function DoBoomerang()
 	--Check to see if we're close to the npc. If not, move to it.
 	if mq.TLO.SpawnCount('magnificent radius 50')() > 0 then
 		local closeToNPC = true
+		mq.cmdf('/squelch /dgga /nav locyx 169 417 -23')
 	else
 		mq.cmdf('/squelch /dgga /nav locyx 169 417 -23')
 	end
+	-- checking cooldown of task, waiting if on cooldown
+	isInstanceOnCooldown()
 		if myID ~= groupLeaderID then
-			mq.delay(32000)
+			mq.delay('10s')
 		end
 		if myID == groupLeaderID then
 			mq.cmdf('/squelch /tar magnificent')
-			mq.delay(2000)
+			mq.delay('1s')
 			mq.cmdf('/squelch /say crazy')
-			mq.delay(2000)
+			mq.delay('1s')
 			mq.cmdf('/squelch /say specific')
 			-- Setting up campfire.
-			mq.delay(4000)
+			mq.delay('2s')
 			-- Settings monsters, me first, then loop through group.
 			mq.cmdf('/notify TaskTemplateSelectWnd TaskTemplateSelectListRequired listselect 1')
-			--mq.cmdf('/squelch /lua stop brellsboomerang')
-			mq.delay(2000)
+			mq.delay('1s')
 			mq.cmdf('/squelch /notify TaskTemplateSelectWnd TaskTemplateSelectAcceptButton LeftMouseUp')
 			-- Loop to get others to choose.
 			i = 1
@@ -242,16 +292,15 @@ local function DoBoomerang()
 			gSize = groupSize - 1
 			for i=1,gSize do
 				gMemberName = mq.TLO.Group.Member(i).CleanName()
-				mq.delay(2000)
+				mq.delay('1s')
 				Write.Info('\a-gAssigning monster to %s', gMemberName)
 				mq.cmdf('/squelch /dex %s /notify TaskTemplateSelectWnd TaskTemplateSelectListRequired listselect %s', gMemberName, y)
-				mq.delay(2000)
+				mq.delay('1s')
 				mq.cmdf('/squelch /dex %s /notify TaskTemplateSelectWnd TaskTemplateSelectAcceptButton LeftMouseUp', gMemberName)
 				y = y + 1
 			end
 			Write.Info('\a-gChecking and creating Fellowship Campfire.')
 			campFire()
-			mq.delay(3000)
 		end
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
 		currentState = currentState + 1
@@ -261,8 +310,23 @@ local function DoBoomerang()
 	if loopState[currentState] == "travelMission" then
 		Write.Info('\a-gMoving to instance.')
 		checkInvisAndAct()
+		-- moveto #1
+		mq.cmdf('/squelch /nav locyx -20 260')
+		isNavActive()
+		-- moveto #2
+		mq.cmdf('/squelch /nav locyx -187 229')
+		isNavActive()
+		-- moveto #3
+		mq.cmdf('/squelch /nav locyx -135 18')
+		isNavActive()
+		-- moveto #4
+		mq.cmdf('/squelch /nav locyx -156 -244')
+		isNavActive()
+		-- moveto #5 - door
 		mq.cmdf('/squelch /nav locyx -239 -567')
-		mq.delay(30000)
+		isNavActive()
+
+
 		-- Syncing up group.
 		if myID ~= groupLeaderID then
 			mq.delay(5000)
@@ -300,8 +364,8 @@ local function DoBoomerang()
 	if loopState[currentState] == "doEvent" then
 		Write.Info('\a-gRunning brellsboomerang.mac -- do not interfere. Will campfire once done and restart within 40 minutes.')
 		mq.cmdf('/squelch /mac boomerang')
+		checkIfMacroRunning()
 		Write.Info('\a-gInstance ending. Waiting for port out.')
-		mq.delay(1080000)
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
 		currentState = currentState + 1
@@ -319,26 +383,47 @@ local function DoBoomerang()
 			local correctZone = true
 			Write.Info('\a-gCorrect zone. Next step; make sure we end macro, remove invis, and cast Insignia.')
 			checkGroupStatus()
-			mq.delay(5000)
-			mq.cmdf('/squelch /endmac')
-			mq.delay(1000)
-			mq.cmdf('/squelch /makemevisible')
-			mq.delay(1000)
-			mq.cmdf('/squelch /casting "Fellowship Registration Insignia"')
+			if mq.TLO.Me.Fellowship.Campfire() == false then
+				mq.delay('1s')
+				-- nav back to camp, but first, check invisstatus
+				checkInvisAndAct()
+				mq.delay('5s')
+				-- moveto #1
+				mq.cmdf('/squelch /nav locyx -156 -244')
+				isNavActive()
+				-- moveto #2
+				mq.cmdf('/squelch /nav locyx -135 18')
+				isNavActive()
+				-- moveto #3
+				mq.cmdf('/squelch /nav locyx -187 229')
+				isNavActive()					
+				-- moveto #4
+				mq.cmdf('/squelch /nav locyx -20 260')
+				isNavActive()
+				-- moveto camp
+				mq.cmdf('/squelch /nav locyx 169 417 -23')
+				isNavActive()
+			else
+				mq.delay('1s')
+				mq.cmdf('/squelch /makemevisible')
+				mq.delay('1s')
+				mq.cmdf('/squelch /casting "Fellowship Registration Insignia"')
+			end
+			mq.delay('2m')
 		else
 			Write.Info('\a-gSomething has gone wrong. Either dead/LD or plain missing. Ending LUA.')
 			mq.delay(5000)
 			mq.cmdf('/squelch /dgga /lua stop %s', luaName)
 		end
-			-- Updating state
-			Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
-			currentState = currentState + 1
-			mq.delay(1000)
+		-- Updating state
+		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
+		currentState = currentState + 1
+		mq.delay(1000)
 	end
 	
 	if loopState[currentState] == "waitingForRepop" then
-		Write.Info('\a-gWe are currently idling. Waiting ~45 mins.')
-		mq.delay(2700000)
+		isInstanceOnCooldown()
+		Write.Info('\a-gWe are currently idling.')
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState-5])
 		currentState = currentState - 5
