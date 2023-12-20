@@ -266,7 +266,8 @@ local function DoBoomerang()
 
 	--check group
 	checkGroup()
-	checkInvisAndAct()
+	-- remove afk
+	mq.cmdf('/squelch /dgga /afk off')
 
 	--Check to see if we're close to the npc. If not, move to it.
 	if mq.TLO.SpawnCount('magnificent radius 50')() > 0 then
@@ -276,6 +277,7 @@ local function DoBoomerang()
 		mq.cmdf('/squelch /dgga /nav locyx 169 417 -23')
 	end
 	-- checking cooldown of task, waiting if on cooldown
+	mq.doevents()
 	isInstanceOnCooldown()
 		if myID ~= groupLeaderID then
 			mq.delay('10s')
@@ -342,10 +344,11 @@ local function DoBoomerang()
 			mq.delay(1000)
 		end
 		mq.cmdf('/squelch /doortarget')
-		-- Making sure we actually get the group to click the door.
+		-- Click door and enter.
 		mq.cmdf('/squelch /click left door')
 		mq.cmdf('/squelch /click left door')
 		mq.cmdf('/squelch /click left door')
+		-- Wait for zonein
 		mq.delay(30000)
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
@@ -359,7 +362,7 @@ local function DoBoomerang()
 			Write.Info('\a-gGroupleader starting event.')
 			if myID == groupLeaderID then
 				mq.cmdf('/squelch /nav spawn npc Gilbot')
-				mq.delay(2000)
+				isNavActive()
 				mq.cmdf('/squelch /tar Gilbot')			
 				mq.cmdf('/squelch /say start')
 			end
