@@ -203,7 +203,7 @@ local function isInstanceOnCooldown()
 		local coolinminutes = tonumber(CD) + 5
 		Write.Info('\a-gInstance is currently cooling down. %s minutes remaining. Going in %s minutes. Updating every 3 minutes.', CD, coolinminutes)
 		mq.delay('3m')
-		CD = CD - 1
+		CD = CD - 3
 	end
 	--if(NOTIMER) then
 	--	print('No tasktimers. Good. We will go immediately.')
