@@ -46,7 +46,7 @@ local function checkCooldown()
 end
 
 mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
-mq.event("notimer", "#1 currently have any task timers.", callback)
+-- mq.event("notimer", "#1 currently have any task timers.", callback)
 
 local function isempty(s)
 	return s == nil or s == ''
@@ -205,13 +205,13 @@ local function isInstanceOnCooldown()
 		mq.delay('3m')
 		CD = CD - 1
 	end
-	if(NOTIMER) then
-		print('No tasktimers. Good. We will go immediately.')
-		mq.delay('10s')
-	else
-		print('Continuing in 5 minutes. Strap in.')
-		mq.delay('5m')
-	end
+	--if(NOTIMER) then
+	--	print('No tasktimers. Good. We will go immediately.')
+	--	mq.delay('10s')
+	--else
+	print('Continuing in 5 minutes. Strap in.')
+	mq.delay('5m')
+	--end
 end
 
 local function checkInvisAndAct()
