@@ -51,7 +51,7 @@ end
 
 mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
 mq.event("eventend", "The results of the contest are as #1", callbackCombat)
--- mq.event("notimer", "#1 currently have any task timers.", callback)
+mq.event("notimer", "#1 currently have any task timers.", callback)
 
 local function checkTeam()
 	local yellow = mq.TLO.FindItemCount('Yellow Boomerang')() -- Yellow Boomerang
@@ -162,12 +162,12 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
                         AmIFeigned()
                         isCombatNavActive()
                         --mq.cmdf('/squelch /nav stop')
-                        mq.delay('1s')
+                        mq.delay(200)
                         mq.cmdf('/squelch /face fast nolook')
                         if mq.TLO.FindItem('Yellow Boomerang').TimerReady() == 0 then
                             mq.cmdf('/squelch /cast item "Yellow Boomerang"')
                         else
-                            mq.delay('1s')
+                            mq.delay(1000)
                             mq.cmdf('/squelch /cast item "Yellow Boomerang"')
                         end
                         AmIFeigned()
@@ -179,12 +179,12 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
                         AmIFeigned()
                         isCombatNavActive()
                         --mq.cmdf('/squelch /nav stop')
-                        mq.delay('1s')
+                        mq.delay(200)
                         mq.cmdf('/squelch /face fast nolook')
                         if mq.TLO.FindItem('Blue Boomerang').TimerReady() == 0 then
                             mq.cmdf('/squelch /cast item "Blue Boomerang"')
                         else
-                            mq.delay('1s')
+                            mq.delay(1000)
                             mq.cmdf('/squelch /cast item "Blue Boomerang"')
                         end
                         AmIFeigned()
@@ -200,12 +200,12 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
                         AmIFeigned()
                         isCombatNavActive()
                         --mq.cmdf('/squelch /nav stop')
-                        mq.delay('1s')
+                        mq.delay(200)
                         mq.cmdf('/squelch /face fast nolook')
                         if mq.TLO.FindItem('Yellow Boomerang').TimerReady() == 0 then
                             mq.cmdf('/squelch /cast item "Yellow Boomerang"')
                         else
-                            mq.delay('1s')
+                            mq.delay(1000)
                             mq.cmdf('/squelch /cast item "Yellow Boomerang"')
                         end
                         AmIFeigned()
@@ -218,12 +218,12 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
                         AmIFeigned()
                         isCombatNavActive()
                         --mq.cmdf('/squelch /nav stop')
-                        mq.delay('1s')
+                        mq.delay(200)
                         mq.cmdf('/squelch /face fast nolook')
                         if mq.TLO.FindItem('Red Boomerang').TimerReady() == 0 then
                             mq.cmdf('/squelch /cast item "Red Boomerang"')
                         else
-                            mq.delay('1s')
+                            mq.delay(1000)
                             mq.cmdf('/squelch /cast item "Red Boomerang"')
                         end
                         AmIFeigned()
@@ -239,12 +239,12 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
                         AmIFeigned()
                         isCombatNavActive()
                         --mq.cmdf('/squelch /nav stop')
-                        mq.delay('1s')
+                        mq.delay(200)
                         mq.cmdf('/squelch /face fast nolook')
                         if mq.TLO.FindItem('Red Boomerang').TimerReady() == 0 then
                             mq.cmdf('/squelch /cast item "Red Boomerang"')
                         else
-                            mq.delay('1s')
+                            mq.delay(1000)
                             mq.cmdf('/squelch /cast item "Red Boomerang"')
                         end
                         AmIFeigned()
@@ -257,12 +257,12 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
                         AmIFeigned()
                         isCombatNavActive()
                         --mq.cmdf('/squelch /nav stop')
-                        mq.delay('1s')
+                        mq.delay(200)
                         mq.cmdf('/squelch /face fast nolook')
                         if mq.TLO.FindItem('Blue Boomerang').TimerReady() == 0 then
                             mq.cmdf('/squelch /cast item "Blue Boomerang"')
                         else
-                            mq.delay('1s')
+                            mq.delay(1000)
                             mq.cmdf('/squelch /cast item "Blue Boomerang"')
                         end
                         AmIFeigned()
@@ -412,13 +412,6 @@ local function checkInvis()
 	end
 end
 
-local function checkIfMacroRunning()
-	while mq.TLO.Macro() == "boomerang.mac" do
-		Write.Info('\a-gMacro is still running. Checking every 2 minutes.')
-		mq.delay('2m')
-	end
-end
-
 local function isInstanceOnCooldown()
 	checkCooldown()
 	if(COOLDOWN) then
@@ -437,8 +430,13 @@ local function isInstanceOnCooldown()
 	--	print('No tasktimers. Good. We will go immediately.')
 	--	mq.delay('10s')
 	--else
-	print('Continuing in 5 minutes. Strap in.')
-	mq.delay('5m')
+	if(NOTIMER == "You do not currently have any task timers.") then
+		Write.Info('\a-gInstance ready. We go immediately.')
+		mq.delay('10s')
+	else
+		print('Continuing in 5 minutes. Strap in.')
+		mq.delay('5m')
+	end
 	--end
 end
 
