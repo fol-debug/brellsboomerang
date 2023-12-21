@@ -140,11 +140,11 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
 
     local allSpawns = mq.getAllSpawns()
     for k, v in pairs(allSpawns) do
-        if(isNPC(v) == true) then
-        	local spawnMaster = mq.TLO.Spawn('BRADiscusController')()
-        	--local spawnMaster = null
-        	--print(spawnMaster)
-	        while spawnMaster ~= NULL do
+        local spawnMaster = mq.TLO.Spawn('BRADiscusController')()
+        --local spawnMaster = null
+        --print(spawnMaster)
+	    while spawnMaster ~= NULL do
+            if(isNPC(v) == true) then
                 AmIFeigned()
                 if(TEAMCOLOR == 'Red') then
                     AmIFeigned()
