@@ -132,6 +132,14 @@ local function isempty(s)
 	return s == nil or s == ''
   end
 
+local function isCombatActive()
+    local spawnMaster = mq.TLO.Spawn('BRADiscusController')()
+    if(spawnMaster == NULL) then
+        COMBATACTIVE = false
+    end
+    return COMBATACTIVE
+end
+
 local function combatRoutine(TEAMCOLOR, MOBLEVEL)
 	-- used for testing MOBLEVEL = 50
 	COMBATACTIVE = true
@@ -139,11 +147,9 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
 	checkCooldown()
 
     local allSpawns = mq.getAllSpawns()
+    while COMBATACTIVE == true do
     for k, v in pairs(allSpawns) do
-        local spawnMaster = mq.TLO.Spawn('BRADiscusController')()
-        --local spawnMaster = null
-        --print(spawnMaster)
-	    while spawnMaster ~= NULL do
+            isCombatActive()
             if(isNPC(v) == true) then
                 AmIFeigned()
                 if(TEAMCOLOR == 'Red') then
@@ -264,7 +270,7 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
             end
         end
     end
-end
+    end
 print('Combat Done')
 end
 
