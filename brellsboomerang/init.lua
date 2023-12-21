@@ -36,6 +36,10 @@ local myID = mq.TLO.Me.ID
 
 local function callback(line, arg1, arg2, arg3)
 	COOLDOWN = arg3
+	
+end
+
+local function callbackNoTimer(line, arg1)
 	NOTIMER = arg1
 end
 
@@ -49,9 +53,9 @@ local function checkCooldown()
 	mq.doevents()
 end
 
-mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
-mq.event("eventend", "The results of the contest are as #1", callbackCombat)
-mq.event("notimer", "#1 currently have any task timers.", callback)
+
+
+
 
 local function checkTeam()
 	local yellow = mq.TLO.FindItemCount('Yellow Boomerang')() -- Yellow Boomerang
@@ -144,8 +148,9 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
 	-- used for testing MOBLEVEL = 50
 	COMBATACTIVE = true
 	mq.cmd('/target clear')
-	checkCooldown()
-
+	--mq.event("eventend", "The results of the contest are as #1", callbackCombat)
+	--checkCooldown()
+	
     local allSpawns = mq.getAllSpawns()
     while COMBATACTIVE == true do
     for k, v in pairs(allSpawns) do
@@ -413,12 +418,14 @@ local function checkInvis()
 end
 
 local function isInstanceOnCooldown()
+	mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
 	checkCooldown()
 	if(COOLDOWN) then
 		CD = tonumber(COOLDOWN)
 	elseif(isempty(COOLDOWN)) then
 		CD = 0
 	end
+	print(CD)
 	while tonumber(CD) > 0 do
 		--print(CD)
 		local coolinminutes = tonumber(CD) + 5
@@ -430,6 +437,8 @@ local function isInstanceOnCooldown()
 	--	print('No tasktimers. Good. We will go immediately.')
 	--	mq.delay('10s')
 	--else
+	mq.event("notimer", "#1 currently have any task timers.", callback)
+	checkCooldown()
 	if(NOTIMER == "You do not currently have any task timers.") then
 		Write.Info('\a-gInstance ready. We go immediately.')
 		mq.delay('10s')
