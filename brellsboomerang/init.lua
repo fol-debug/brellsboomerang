@@ -137,132 +137,135 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
 	COMBATACTIVE = true
 	mq.cmd('/target clear')
 	checkCooldown()
-	local spawnMaster = mq.TLO.Spawn('BRADiscusController')
-	while spawnMaster ~= nil do
-		local allSpawns = mq.getAllSpawns()
-		for k, v in pairs(allSpawns) do
-			if(isNPC(v) == true) then
-				AmIFeigned()
-				if(TEAMCOLOR == 'Red') then
-					AmIFeigned()
-					if(NPCLevel(v) == MOBLEVEL1) then
-						--print(NPCLevel(v))
-						--print(NPCId(v))
-						mq.cmdf('/squelch /target id %s', NPCId(v))
-						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
-						AmIFeigned()
-						isCombatNavActive()
-						--mq.cmdf('/squelch /nav stop')
-						mq.delay('1s')
-						mq.cmdf('/squelch /face fast nolook')
-						if mq.TLO.FindItem('Yellow Boomerang').TimerReady() == 0 then
-							mq.cmdf('/squelch /cast item "Yellow Boomerang"')
-						else
-							mq.delay('1s')
-							mq.cmdf('/squelch /cast item "Yellow Boomerang"')
-						end
-						AmIFeigned()
-					elseif(NPCLevel(v) == MOBLEVEL2) then
-						--print(NPCLevel(v))
-						--print(NPCId(v))
-						mq.cmdf('/squelch /target id %s', NPCId(v))
-						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
-						AmIFeigned()
-						isCombatNavActive()
-						--mq.cmdf('/squelch /nav stop')
-						mq.delay('1s')
-						mq.cmdf('/squelch /face fast nolook')
-						if mq.TLO.FindItem('Blue Boomerang').TimerReady() == 0 then
-							mq.cmdf('/squelch /cast item "Blue Boomerang"')
-						else
-							mq.delay('1s')
-							mq.cmdf('/squelch /cast item "Blue Boomerang"')
-						end
-						AmIFeigned()
-					end
-				elseif(TEAMCOLOR == 'Blue') then
-					AmIFeigned()
-					if(NPCLevel(v) == MOBLEVEL1) then
-						AmIFeigned()
-						--print(NPCLevel(v))
-						--print(NPCId(v))
-						mq.cmdf('/squelch /target id %s', NPCId(v))
-						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
-						AmIFeigned()
-						isCombatNavActive()
-						--mq.cmdf('/squelch /nav stop')
-						mq.delay('1s')
-						mq.cmdf('/squelch /face fast nolook')
-						if mq.TLO.FindItem('Yellow Boomerang').TimerReady() == 0 then
-							mq.cmdf('/squelch /cast item "Yellow Boomerang"')
-						else
-							mq.delay('1s')
-							mq.cmdf('/squelch /cast item "Yellow Boomerang"')
-						end
-						AmIFeigned()
-					elseif(NPCLevel(v) == MOBLEVEL2) then
-						AmIFeigned()
-						--print(NPCLevel(v))
-						--print(NPCId(v))
-						mq.cmdf('/squelch /target id %s', NPCId(v))
-						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
-						AmIFeigned()
-						isCombatNavActive()
-						--mq.cmdf('/squelch /nav stop')
-						mq.delay('1s')
-						mq.cmdf('/squelch /face fast nolook')
-						if mq.TLO.FindItem('Red Boomerang').TimerReady() == 0 then
-							mq.cmdf('/squelch /cast item "Red Boomerang"')
-						else
-							mq.delay('1s')
-							mq.cmdf('/squelch /cast item "Red Boomerang"')
-						end
-						AmIFeigned()
-					end
-				else
-					AmIFeigned()
-					if(NPCLevel(v) == MOBLEVEL1) then
-						AmIFeigned()
-						--print(NPCLevel(v))
-						--print(NPCId(v))
-						mq.cmdf('/squelch /target id %s', NPCId(v))
-						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
-						AmIFeigned()
-						isCombatNavActive()
-						--mq.cmdf('/squelch /nav stop')
-						mq.delay('1s')
-						mq.cmdf('/squelch /face fast nolook')
-						if mq.TLO.FindItem('Red Boomerang').TimerReady() == 0 then
-							mq.cmdf('/squelch /cast item "Red Boomerang"')
-						else
-							mq.delay('1s')
-							mq.cmdf('/squelch /cast item "Red Boomerang"')
-						end
-						AmIFeigned()
-					elseif(NPCLevel(v) == MOBLEVEL2) then
-						AmIFeigned()
-						--print(NPCLevel(v))
-						--print(NPCId(v))
-						mq.cmdf('/squelch /target id %s', NPCId(v))
-						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
-						AmIFeigned()
-						isCombatNavActive()
-						--mq.cmdf('/squelch /nav stop')
-						mq.delay('1s')
-						mq.cmdf('/squelch /face fast nolook')
-						if mq.TLO.FindItem('Blue Boomerang').TimerReady() == 0 then
-							mq.cmdf('/squelch /cast item "Blue Boomerang"')
-						else
-							mq.delay('1s')
-							mq.cmdf('/squelch /cast item "Blue Boomerang"')
-						end
-						AmIFeigned()
-					end
-				end
-			end
-		end
-	end
-	print('Combat Done')
+
+    local allSpawns = mq.getAllSpawns()
+    for k, v in pairs(allSpawns) do
+        if(isNPC(v) == true) then
+        	local spawnMaster = mq.TLO.Spawn('BRADiscusController')
+        	--local spawnMaster = null
+        	--print(spawnMaster)
+	        while spawnMaster ~= NULL do
+                AmIFeigned()
+                if(TEAMCOLOR == 'Red') then
+                    AmIFeigned()
+                    if(NPCLevel(v) == MOBLEVEL1) then
+                        --print(NPCLevel(v))
+                        --print(NPCId(v))
+                        mq.cmdf('/squelch /target id %s', NPCId(v))
+                        mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+                        AmIFeigned()
+                        isCombatNavActive()
+                        --mq.cmdf('/squelch /nav stop')
+                        mq.delay('1s')
+                        mq.cmdf('/squelch /face fast nolook')
+                        if mq.TLO.FindItem('Yellow Boomerang').TimerReady() == 0 then
+                            mq.cmdf('/squelch /cast item "Yellow Boomerang"')
+                        else
+                            mq.delay('1s')
+                            mq.cmdf('/squelch /cast item "Yellow Boomerang"')
+                        end
+                        AmIFeigned()
+                    elseif(NPCLevel(v) == MOBLEVEL2) then
+                        --print(NPCLevel(v))
+                        --print(NPCId(v))
+                        mq.cmdf('/squelch /target id %s', NPCId(v))
+                        mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+                        AmIFeigned()
+                        isCombatNavActive()
+                        --mq.cmdf('/squelch /nav stop')
+                        mq.delay('1s')
+                        mq.cmdf('/squelch /face fast nolook')
+                        if mq.TLO.FindItem('Blue Boomerang').TimerReady() == 0 then
+                            mq.cmdf('/squelch /cast item "Blue Boomerang"')
+                        else
+                            mq.delay('1s')
+                            mq.cmdf('/squelch /cast item "Blue Boomerang"')
+                        end
+                        AmIFeigned()
+                    end
+                elseif(TEAMCOLOR == 'Blue') then
+                    AmIFeigned()
+                    if(NPCLevel(v) == MOBLEVEL1) then
+                        AmIFeigned()
+                        --print(NPCLevel(v))
+                        --print(NPCId(v))
+                        mq.cmdf('/squelch /target id %s', NPCId(v))
+                        mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+                        AmIFeigned()
+                        isCombatNavActive()
+                        --mq.cmdf('/squelch /nav stop')
+                        mq.delay('1s')
+                        mq.cmdf('/squelch /face fast nolook')
+                        if mq.TLO.FindItem('Yellow Boomerang').TimerReady() == 0 then
+                            mq.cmdf('/squelch /cast item "Yellow Boomerang"')
+                        else
+                            mq.delay('1s')
+                            mq.cmdf('/squelch /cast item "Yellow Boomerang"')
+                        end
+                        AmIFeigned()
+                    elseif(NPCLevel(v) == MOBLEVEL2) then
+                        AmIFeigned()
+                        --print(NPCLevel(v))
+                        --print(NPCId(v))
+                        mq.cmdf('/squelch /target id %s', NPCId(v))
+                        mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+                        AmIFeigned()
+                        isCombatNavActive()
+                        --mq.cmdf('/squelch /nav stop')
+                        mq.delay('1s')
+                        mq.cmdf('/squelch /face fast nolook')
+                        if mq.TLO.FindItem('Red Boomerang').TimerReady() == 0 then
+                            mq.cmdf('/squelch /cast item "Red Boomerang"')
+                        else
+                            mq.delay('1s')
+                            mq.cmdf('/squelch /cast item "Red Boomerang"')
+                        end
+                        AmIFeigned()
+                    end
+                else
+                    AmIFeigned()
+                    if(NPCLevel(v) == MOBLEVEL1) then
+                        AmIFeigned()
+                        --print(NPCLevel(v))
+                        --print(NPCId(v))
+                        mq.cmdf('/squelch /target id %s', NPCId(v))
+                        mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+                        AmIFeigned()
+                        isCombatNavActive()
+                        --mq.cmdf('/squelch /nav stop')
+                        mq.delay('1s')
+                        mq.cmdf('/squelch /face fast nolook')
+                        if mq.TLO.FindItem('Red Boomerang').TimerReady() == 0 then
+                            mq.cmdf('/squelch /cast item "Red Boomerang"')
+                        else
+                            mq.delay('1s')
+                            mq.cmdf('/squelch /cast item "Red Boomerang"')
+                        end
+                        AmIFeigned()
+                    elseif(NPCLevel(v) == MOBLEVEL2) then
+                        AmIFeigned()
+                        --print(NPCLevel(v))
+                        --print(NPCId(v))
+                        mq.cmdf('/squelch /target id %s', NPCId(v))
+                        mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+                        AmIFeigned()
+                        isCombatNavActive()
+                        --mq.cmdf('/squelch /nav stop')
+                        mq.delay('1s')
+                        mq.cmdf('/squelch /face fast nolook')
+                        if mq.TLO.FindItem('Blue Boomerang').TimerReady() == 0 then
+                            mq.cmdf('/squelch /cast item "Blue Boomerang"')
+                        else
+                            mq.delay('1s')
+                            mq.cmdf('/squelch /cast item "Blue Boomerang"')
+                        end
+                        AmIFeigned()
+                end
+            end
+        end
+    end
+end
+print('Combat Done')
 end
 
 local function doBoomerangCombat()
@@ -672,9 +675,15 @@ local function DoBoomerang()
 		
 end
 
+local function test()
+    local spawnMaster = mq.TLO.Spawn('Gilbom')
+    print(spawnMaster)
+end
+
 while DoLoop do
 	--pause_script()
 	mq.doevents()
 	DoBoomerang()
+	--test()
 	mq.delay('5s')
 end
