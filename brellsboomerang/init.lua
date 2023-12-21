@@ -573,6 +573,7 @@ local function DoBoomerang()
 		end
 		mq.cmdf('/squelch /doortarget')
 		-- Click door and enter.
+		mq.delay('20s')
 		mq.cmdf('/squelch /click left door')
 		mq.cmdf('/squelch /click left door')
 		mq.cmdf('/squelch /click left door')
