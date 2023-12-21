@@ -418,35 +418,31 @@ local function checkInvis()
 end
 
 local function isInstanceOnCooldown()
-	mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
-	checkCooldown()
-	if(COOLDOWN) then
-		CD = tonumber(COOLDOWN)
-	elseif(isempty(COOLDOWN)) then
-		CD = 0
-	end
-	print(CD)
-	while tonumber(CD) > 0 do
-		--print(CD)
-		local coolinminutes = tonumber(CD) + 5
-		Write.Info('\a-gInstance is currently cooling down. %s minutes remaining. Going in %s minutes. Updating every 3 minutes.', CD, coolinminutes)
-		mq.delay('3m')
-		CD = CD - 3
-	end
-	--if(NOTIMER) then
-	--	print('No tasktimers. Good. We will go immediately.')
-	--	mq.delay('10s')
-	--else
-	mq.event("notimer", "#1 currently have any task timers.", callback)
-	checkCooldown()
-	if(NOTIMER == "You do not currently have any task timers.") then
-		Write.Info('\a-gInstance ready. We go immediately.')
-		mq.delay('10s')
-	else
-		print('Continuing in 5 minutes. Strap in.')
-		mq.delay('5m')
-	end
-	--end
+	if myID == groupLeaderID then
+		mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
+		checkCooldown()
+		if(COOLDOWN) then
+			CD = tonumber(COOLDOWN)
+		elseif(isempty(COOLDOWN)) then
+			CD = 0
+		end
+		while tonumber(CD) > 0 do
+			--print(CD)
+			local coolinminutes = tonumber(CD) + 5
+			Write.Info('\a-gInstance is currently cooling down. %s minutes remaining. Going in %s minutes. Updating every 3 minutes.', CD, coolinminutes)
+			mq.delay('3m')
+			CD = CD - 3
+		end
+		mq.event("notimer", "#1 currently have any task timers.", callbackNoTimer)
+		checkCooldown()
+		if(NOTIMER == "You do not currently have any task timers.") then
+			Write.Info('\a-gInstance ready. We go immediately.')
+			mq.delay('10s')
+		else
+			print('Continuing in 5 minutes. Strap in.')
+			mq.delay('5m')
+		end
+end
 end
 
 local function checkInvisAndAct()
@@ -474,10 +470,10 @@ end
 local function DoBoomerang()
 	local areWeReady = true
 	-- load necessary plugins
-	mq.cmd('/squelch /dgga /plugin mq2dannet')
-	mq.cmd('/squelch /dgga /plugin mq2nav')
+	mq.cmd('/squelch /plugin mq2dannet')
+	mq.cmd('/squelch /plugin mq2nav')
 	mq.cmd('/squelch /autoinventory')
-	mq.cmd('/squelch /dgga /plugin mq2status')
+	mq.cmd('/squelch /plugin mq2status')
 	mq.delay(1000)
 	Write.Info('\a-gWelcome to Boomerang Hell! Please be advised that we expect you to have Cloudy Potions available.')
 
@@ -515,7 +511,7 @@ local function DoBoomerang()
 	mq.doevents()
 	isInstanceOnCooldown()
 		if myID ~= groupLeaderID then
-			mq.delay('10s')
+			mq.delay('20s')
 		end
 		if myID == groupLeaderID then
 			mq.cmdf('/squelch /tar magnificent')
@@ -543,6 +539,7 @@ local function DoBoomerang()
 				mq.cmdf('/squelch /dex %s /notify TaskTemplateSelectWnd TaskTemplateSelectAcceptButton LeftMouseUp', gMemberName)
 				y = y + 1
 			end
+			mq.TLO.Window('TaskTemplateSelectWnd').DoClose()
 			Write.Info('\a-gChecking and creating Fellowship Campfire.')
 			campFire()
 		end
