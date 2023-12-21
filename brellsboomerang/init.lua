@@ -615,6 +615,7 @@ local function DoBoomerang()
 		-- Quitting task and zoning out
 		mq.cmdf('/taskquit')
 		Write.Info('\a-gInstance ending. Waiting for port out.')
+		mq.delay('5m')
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
 		currentState = currentState + 1
