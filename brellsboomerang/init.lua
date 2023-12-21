@@ -39,6 +39,10 @@ local function callback(line, arg1, arg2, arg3)
 	NOTIMER = arg1
 end
 
+local function callbackCombat(line, arg1)
+	ENDED = arg1
+end
+
 local function checkCooldown()
 	mq.cmd('/tasktimer')
 	mq.delay('5s')
@@ -46,11 +50,226 @@ local function checkCooldown()
 end
 
 mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
+mq.event("eventend", "The results of the contest are as #1", callbackCombat)
 -- mq.event("notimer", "#1 currently have any task timers.", callback)
+
+local function checkTeam()
+	local yellow = mq.TLO.FindItemCount('Yellow Boomerang')() -- Yellow Boomerang
+	local blue = mq.TLO.FindItemCount('Blue Boomerang')() -- Blue Boomerang
+	local red = mq.TLO.FindItemCount('Red Boomerang')() -- Red Boomerang
+	if yellow == 1 and blue == 1 then
+		TEAMCOLOR = 'Red'
+		MOBLEVEL1 = 86
+		MOBLEVEL2 = 84
+	elseif yellow == 1 and red == 1 then
+		TEAMCOLOR = 'Blue'
+		MOBLEVEL1 = 86
+		MOBLEVEL2 = 89
+	elseif blue == 1 and red == 1 then
+		TEAMCOLOR = 'Yellow'
+		MOBLEVEL1 = 89
+		MOBLEVEL2 = 84
+	end
+end
+
+local function checkforPowderKeg()
+	local checkid = mq.TLO.NearestSpawn(string.format('race "powder keg"')).ID()
+	--print(mq.TLO.NearestSpawn(string.format('race "powder keg"')).ID())
+	--print(checkid)
+	local distance = mq.TLO.NearestSpawn(string.format('race "powder keg"')).Distance()
+	local y = mq.TLO.NearestSpawn(string.format('race "powder keg"')).Y()
+	local x = mq.TLO.NearestSpawn(string.format('race "powder keg"')).X()
+	if (checkid and distance ~= nil and distance<50) then
+		mq.cmd('/squelch /nav pause')
+		mq.cmdf('/squelch /face fast nolook loc %s, %s', y, x)
+		print('Barrel Detected')
+		mq.cmd('/squelch /keypress back hold')
+		mq.delay(500)
+		mq.cmd('/squelch /keypress back')
+		if math.random(1,2) == 1 then
+			mq.cmdf('/squelch /keypress STRAFE_LEFT hold')
+			mq.delay(500)
+			mq.cmdf('/squelch /keypress STRAFE_LEFT')
+		else
+			mq.cmdf('/squelch /keypress STRAFE_RIGHT hold')
+			mq.delay(500)
+			mq.cmdf('/squelch /keypress STRAFE_RIGHT')
+		end
+		mq.cmd('/squelch /nav pause')
+	end
+end
+
+local function AmIFeigned()
+	if(mq.TLO.Me.Feigning() == 1) then
+		Write.Info('\a-gStunned and feigned. Standing when ready.')
+		mq.delay('3s')
+		mq.cmd('/stand')
+	end
+end
+
+local function isCombatNavActive()
+	while mq.TLO.Navigation.Active() do
+		mq.cmd('/stand')
+		AmIFeigned()
+		checkforPowderKeg()
+		mq.delay(10)
+	end
+end
+
+local function isNPC(spawn)
+    return spawn.Type() == 'NPC'
+end
+
+local function NPCLevel(spawn)
+	return spawn.Level()
+end
+
+local function NPCId(spawn)
+	return spawn.ID()
+end
 
 local function isempty(s)
 	return s == nil or s == ''
   end
+
+local function combatRoutine(TEAMCOLOR, MOBLEVEL)
+	-- used for testing MOBLEVEL = 50
+	COMBATACTIVE = true
+	mq.cmd('/target clear')
+	checkCooldown()
+	local spawnMaster = mq.TLO.Spawn('BRADiscusController')
+	while spawnMaster ~= nil do
+		local allSpawns = mq.getAllSpawns()
+		for k, v in pairs(allSpawns) do
+			if(isNPC(v) == true) then
+				AmIFeigned()
+				if(TEAMCOLOR == 'Red') then
+					AmIFeigned()
+					if(NPCLevel(v) == MOBLEVEL1) then
+						--print(NPCLevel(v))
+						--print(NPCId(v))
+						mq.cmdf('/squelch /target id %s', NPCId(v))
+						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+						AmIFeigned()
+						isCombatNavActive()
+						--mq.cmdf('/squelch /nav stop')
+						mq.delay('1s')
+						mq.cmdf('/squelch /face fast nolook')
+						if mq.TLO.FindItem('Yellow Boomerang').TimerReady() == 0 then
+							mq.cmdf('/squelch /cast item "Yellow Boomerang"')
+						else
+							mq.delay('1s')
+							mq.cmdf('/squelch /cast item "Yellow Boomerang"')
+						end
+						AmIFeigned()
+					elseif(NPCLevel(v) == MOBLEVEL2) then
+						--print(NPCLevel(v))
+						--print(NPCId(v))
+						mq.cmdf('/squelch /target id %s', NPCId(v))
+						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+						AmIFeigned()
+						isCombatNavActive()
+						--mq.cmdf('/squelch /nav stop')
+						mq.delay('1s')
+						mq.cmdf('/squelch /face fast nolook')
+						if mq.TLO.FindItem('Blue Boomerang').TimerReady() == 0 then
+							mq.cmdf('/squelch /cast item "Blue Boomerang"')
+						else
+							mq.delay('1s')
+							mq.cmdf('/squelch /cast item "Blue Boomerang"')
+						end
+						AmIFeigned()
+					end
+				elseif(TEAMCOLOR == 'Blue') then
+					AmIFeigned()
+					if(NPCLevel(v) == MOBLEVEL1) then
+						AmIFeigned()
+						--print(NPCLevel(v))
+						--print(NPCId(v))
+						mq.cmdf('/squelch /target id %s', NPCId(v))
+						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+						AmIFeigned()
+						isCombatNavActive()
+						--mq.cmdf('/squelch /nav stop')
+						mq.delay('1s')
+						mq.cmdf('/squelch /face fast nolook')
+						if mq.TLO.FindItem('Yellow Boomerang').TimerReady() == 0 then
+							mq.cmdf('/squelch /cast item "Yellow Boomerang"')
+						else
+							mq.delay('1s')
+							mq.cmdf('/squelch /cast item "Yellow Boomerang"')
+						end
+						AmIFeigned()
+					elseif(NPCLevel(v) == MOBLEVEL2) then
+						AmIFeigned()
+						--print(NPCLevel(v))
+						--print(NPCId(v))
+						mq.cmdf('/squelch /target id %s', NPCId(v))
+						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+						AmIFeigned()
+						isCombatNavActive()
+						--mq.cmdf('/squelch /nav stop')
+						mq.delay('1s')
+						mq.cmdf('/squelch /face fast nolook')
+						if mq.TLO.FindItem('Red Boomerang').TimerReady() == 0 then
+							mq.cmdf('/squelch /cast item "Red Boomerang"')
+						else
+							mq.delay('1s')
+							mq.cmdf('/squelch /cast item "Red Boomerang"')
+						end
+						AmIFeigned()
+					end
+				else
+					AmIFeigned()
+					if(NPCLevel(v) == MOBLEVEL1) then
+						AmIFeigned()
+						--print(NPCLevel(v))
+						--print(NPCId(v))
+						mq.cmdf('/squelch /target id %s', NPCId(v))
+						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+						AmIFeigned()
+						isCombatNavActive()
+						--mq.cmdf('/squelch /nav stop')
+						mq.delay('1s')
+						mq.cmdf('/squelch /face fast nolook')
+						if mq.TLO.FindItem('Red Boomerang').TimerReady() == 0 then
+							mq.cmdf('/squelch /cast item "Red Boomerang"')
+						else
+							mq.delay('1s')
+							mq.cmdf('/squelch /cast item "Red Boomerang"')
+						end
+						AmIFeigned()
+					elseif(NPCLevel(v) == MOBLEVEL2) then
+						AmIFeigned()
+						--print(NPCLevel(v))
+						--print(NPCId(v))
+						mq.cmdf('/squelch /target id %s', NPCId(v))
+						mq.cmdf('/squelch /nav spawn id %s | dist=30', NPCId(v))
+						AmIFeigned()
+						isCombatNavActive()
+						--mq.cmdf('/squelch /nav stop')
+						mq.delay('1s')
+						mq.cmdf('/squelch /face fast nolook')
+						if mq.TLO.FindItem('Blue Boomerang').TimerReady() == 0 then
+							mq.cmdf('/squelch /cast item "Blue Boomerang"')
+						else
+							mq.delay('1s')
+							mq.cmdf('/squelch /cast item "Blue Boomerang"')
+						end
+						AmIFeigned()
+					end
+				end
+			end
+		end
+	end
+	print('Combat Done')
+end
+
+local function doBoomerangCombat()
+	checkTeam()
+	Write.Info('\a-gOk, you are on team %s, lets fight!', TEAMCOLOR)
+	combatRoutine(TEAMCOLOR, MOBLEVEL)
+end
 
 -- Purloined from Easy.lua and PriceOfKnowledge.lua
 local function campFire()
@@ -279,8 +498,6 @@ local function DoBoomerang()
 	-- checking cooldown of task, waiting if on cooldown
 	mq.doevents()
 	isInstanceOnCooldown()
-	local brawl = mq.TLO.Task("Brell's Arena - Boomerang Brawl!")
-	print(brawl)
 		if myID ~= groupLeaderID then
 			mq.delay('10s')
 		end
@@ -382,9 +599,14 @@ local function DoBoomerang()
 	end
 
 	if loopState[currentState] == "doEvent" then
-		Write.Info('\a-gRunning brellsboomerang.mac -- do not interfere. Will campfire once done and restart within 40 minutes.')
-		mq.cmdf('/squelch /mac boomerang')
-		checkIfMacroRunning()
+		Write.Info('\a-gRunning combat routine.')
+		if mq.TLO.Zone.ID() == 492 then
+			doBoomerangCombat()
+		else
+			Write.Info('\a-gNot in the correct zone. Whats going on?')
+		end
+		-- Quitting task and zoning out
+		mq.cmdf('/taskquit')
 		Write.Info('\a-gInstance ending. Waiting for port out.')
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState+1])
