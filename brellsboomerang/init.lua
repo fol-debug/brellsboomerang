@@ -141,7 +141,7 @@ local function combatRoutine(TEAMCOLOR, MOBLEVEL)
     local allSpawns = mq.getAllSpawns()
     for k, v in pairs(allSpawns) do
         if(isNPC(v) == true) then
-        	local spawnMaster = mq.TLO.Spawn('BRADiscusController')
+        	local spawnMaster = mq.TLO.Spawn('BRADiscusController')()
         	--local spawnMaster = null
         	--print(spawnMaster)
 	        while spawnMaster ~= NULL do
@@ -676,8 +676,14 @@ local function DoBoomerang()
 end
 
 local function test()
-    local spawnMaster = mq.TLO.Spawn('Gilbom')
-    print(spawnMaster)
+    local spawnMaster = mq.TLO.Spawn('gilbot')()
+    --local spawnMaster = null
+    --print(spawnMaster)
+    while spawnMaster ~= NULL do
+        print(spawnMaster)
+        print('test')
+        mq.delay('3s')
+    end
 end
 
 while DoLoop do
