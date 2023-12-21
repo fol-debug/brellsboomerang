@@ -609,11 +609,8 @@ local function DoBoomerang()
 
 	if loopState[currentState] == "doEvent" then
 		Write.Info('\a-gRunning combat routine.')
-		if mq.TLO.Zone.ID() == 492 then
-			doBoomerangCombat()
-		else
-			Write.Info('\a-gNot in the correct zone. Whats going on?')
-		end
+		mq.delay('10s')
+		doBoomerangCombat()
 		-- Quitting task and zoning out
 		mq.cmdf('/taskquit')
 		Write.Info('\a-gInstance ending. Waiting for port out.')
