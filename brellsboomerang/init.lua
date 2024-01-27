@@ -418,31 +418,29 @@ local function checkInvis()
 end
 
 local function isInstanceOnCooldown()
-	if myID == groupLeaderID then
-		mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
-		checkCooldown()
-		if(COOLDOWN) then
-			CD = tonumber(COOLDOWN)
-		elseif(isempty(COOLDOWN)) then
-			CD = 0
-		end
-		while tonumber(CD) > 0 do
-			--print(CD)
-			local coolinminutes = tonumber(CD) + 5
-			Write.Info('\a-gInstance is currently cooling down. %s minutes remaining. Going in %s minutes. Updating every 3 minutes.', CD, coolinminutes)
-			mq.delay('3m')
-			CD = CD - 3
-		end
-		mq.event("notimer", "#1 currently have any task timers.", callbackNoTimer)
-		checkCooldown()
-		if(NOTIMER == "You do not currently have any task timers.") then
-			Write.Info('\a-gInstance ready. We go immediately.')
-			mq.delay('10s')
-		else
-			print('Continuing in 5 minutes. Strap in.')
-			mq.delay('5m')
-		end
-end
+	mq.event("tasktimer", "'Brell's Arena - Boomerang Brawl!' replay timer: #1#d:#2#h:#3#m remaining.", callback)
+	checkCooldown()
+	if(COOLDOWN) then
+		CD = tonumber(COOLDOWN)
+	elseif(isempty(COOLDOWN)) then
+		CD = 0
+	end
+	while tonumber(CD) > 0 do
+		--print(CD)
+		local coolinminutes = tonumber(CD) + 5
+		Write.Info('\a-gInstance is currently cooling down. %s minutes remaining. Going in %s minutes. Updating every 3 minutes.', CD, coolinminutes)
+		mq.delay('3m')
+		CD = CD - 3
+	end
+	mq.event("notimer", "#1 currently have any task timers.", callbackNoTimer)
+	checkCooldown()
+	if(NOTIMER == "You do not currently have any task timers.") then
+		Write.Info('\a-gInstance ready. We go immediately.')
+		mq.delay('10s')
+	else
+		print('Continuing in 5 minutes. Strap in.')
+		mq.delay('5m')
+	end
 end
 
 local function checkInvisAndAct()
@@ -510,9 +508,6 @@ local function DoBoomerang()
 	-- checking cooldown of task, waiting if on cooldown
 	mq.doevents()
 	isInstanceOnCooldown()
-		if myID ~= groupLeaderID then
-			mq.delay('20s')
-		end
 		if myID == groupLeaderID then
 			mq.cmdf('/squelch /tar magnificent')
 			mq.delay('1s')
@@ -552,35 +547,37 @@ local function DoBoomerang()
 		Write.Info('\a-gMoving to instance.')
 		checkInvisAndAct()
 		-- moveto #1
-		mq.cmdf('/squelch /nav locyx -20 260')
-		isNavActive()
-		-- moveto #2
-		mq.cmdf('/squelch /nav locyx -187 229')
-		isNavActive()
-		-- moveto #3
-		mq.cmdf('/squelch /nav locyx -135 18')
-		isNavActive()
-		-- moveto #4
-		mq.cmdf('/squelch /nav locyx -156 -244')
-		isNavActive()
-		-- moveto #5 - door
-		mq.cmdf('/squelch /nav locyx -239 -567')
-		isNavActive()
+		if myID == groupLeaderID then
+			mq.cmdf('/squelch /dgga /nav locyx -20 260')
+			isNavActive()
+			-- moveto #2
+			mq.cmdf('/squelch /dgga /nav locyx -187 229')
+			isNavActive()
+			-- moveto #3
+			mq.cmdf('/squelch /dgga /nav locyx -135 18')
+			isNavActive()
+			-- moveto #4
+			mq.cmdf('/squelch /dgga /nav locyx -156 -244')
+			isNavActive()
+			-- moveto #5 - door
+			mq.cmdf('/squelch /dgga /nav locyx -239 -567')
+			isNavActive()
+		end
 
 
 		-- Syncing up group.
+		mq.delay('20s')
 		if myID ~= groupLeaderID then
 			mq.delay(5000)
 		end
 		if myID == groupLeaderID then
-			mq.delay(1000)
+			mq.cmdf('/squelch /dgga /doortarget')
+			-- Click door and enter.
+			
+			mq.cmdf('/squelch /dgga /click left door')
+			mq.cmdf('/squelch /dgga /click left door')
+			mq.cmdf('/squelch /dgga /click left door')
 		end
-		mq.cmdf('/squelch /doortarget')
-		-- Click door and enter.
-		mq.delay('20s')
-		mq.cmdf('/squelch /click left door')
-		mq.cmdf('/squelch /click left door')
-		mq.cmdf('/squelch /click left door')
 		-- Wait for zonein
 		mq.delay(30000)
 		-- Updating state
@@ -614,7 +611,7 @@ local function DoBoomerang()
 
 	if loopState[currentState] == "doEvent" then
 		Write.Info('\a-gRunning combat routine.')
-		mq.delay('10s')
+		mq.delay('5s')
 		doBoomerangCombat()
 		-- Quitting task and zoning out
 		mq.cmdf('/taskquit')
@@ -638,30 +635,34 @@ local function DoBoomerang()
 			Write.Info('\a-gCorrect zone. Next step; make sure we end macro, remove invis, and cast Insignia.')
 			checkGroupStatus()
 			if mq.TLO.Me.Fellowship.Campfire() == false then
-				mq.delay('1s')
-				-- nav back to camp, but first, check invisstatus
-				checkInvisAndAct()
-				mq.delay('5s')
-				-- moveto #1
-				mq.cmdf('/squelch /nav locyx -156 -244')
-				isNavActive()
-				-- moveto #2
-				mq.cmdf('/squelch /nav locyx -135 18')
-				isNavActive()
-				-- moveto #3
-				mq.cmdf('/squelch /nav locyx -187 229')
-				isNavActive()					
-				-- moveto #4
-				mq.cmdf('/squelch /nav locyx -20 260')
-				isNavActive()
-				-- moveto camp
-				mq.cmdf('/squelch /nav locyx 169 417 -23')
-				isNavActive()
+				if myID == groupLeaderID then
+					mq.delay('1s')
+					-- nav back to camp, but first, check invisstatus
+					checkInvisAndAct()
+					mq.delay('5s')
+					-- moveto #1
+					mq.cmdf('/squelch /dgga /nav locyx -156 -244')
+					isNavActive()
+					-- moveto #2
+					mq.cmdf('/squelch /dgga /nav locyx -135 18')
+					isNavActive()
+					-- moveto #3
+					mq.cmdf('/squelch /dgga /nav locyx -187 229')
+					isNavActive()					
+					-- moveto #4
+					mq.cmdf('/squelch /dgga /nav locyx -20 260')
+					isNavActive()
+					-- moveto camp
+					mq.cmdf('/squelch /dgga /nav locyx 169 417 -23')
+					isNavActive()
+				end
 			else
-				mq.delay('1s')
-				mq.cmdf('/squelch /makemevisible')
-				mq.delay('1s')
-				mq.cmdf('/squelch /casting "Fellowship Registration Insignia"')
+				if myID == groupLeaderID then
+					mq.delay('1s')
+					mq.cmdf('/squelch /dgga /makemevisible')
+					mq.delay('1s')
+					mq.cmdf('/squelch /dgga /casting "Fellowship Registration Insignia"')
+				end
 			end
 			mq.delay('2m')
 		else
@@ -676,23 +677,14 @@ local function DoBoomerang()
 	end
 	
 	if loopState[currentState] == "waitingForRepop" then
+		mq.unevent('notimer')
+		mq.unevent('tasktimer')
 		-- Updating state
 		Write.Info('\a-gNext up: %s=>%s', loopState[currentState], loopState[currentState-5])
 		currentState = 0
 		mq.delay(1000)
 	end
 		
-end
-
-local function test()
-    local spawnMaster = mq.TLO.Spawn('gilbot')()
-    --local spawnMaster = null
-    --print(spawnMaster)
-    while spawnMaster ~= NULL do
-        print(spawnMaster)
-        print('test')
-        mq.delay('3s')
-    end
 end
 
 while DoLoop do
